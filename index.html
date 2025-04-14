@@ -6,7 +6,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Labubu Movie Picker</title>
   <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js">
+    function updateLabubuMessage() {
+      const msg = document.getElementById("labubuMessage");
+      if (spinCount === 0) {
+        msg.innerText = "💬 Labubu says: Let's pick a movie! 🎲";
+      } else if (spinCount === 1) {
+        msg.innerText = "💬 Labubu says: That was fun! Wanna spin again?";
+      } else if (spinCount === 2) {
+        msg.innerText = "💬 Labubu says: Last chance! Choose wisely... 🧐";
+      }
+    }
+    updateLabubuMessage();
+      updateMood();
+      updateLabubuFace();
+      document.getElementById("labubu").classList.add("talk");
+      setTimeout(() => document.getElementById("labubu").classList.remove("talk"), 1000);
+      playLabubuVoice();
+    
+    function playLabubuVoice() {
+      const voice = document.getElementById("labubuVoice");
+      voice.currentTime = 0;
+      voice.play();
+    }
+    
+    function updateMood() {
+      const fill = document.getElementById("moodFill");
+      const percent = (spinCount / maxSpins) * 100;
+      fill.style.width = percent + "%";
+    }
+
+    function updateLabubuFace() {
+      const faces = {
+        neutral: document.getElementById("labubuNeutral"),
+        excited: document.getElementById("labubuExcited"),
+        thinking: document.getElementById("labubuThinking"),
+        angry: document.getElementById("labubuAngry"),
+      };
+      Object.values(faces).forEach(img => img.style.display = "none");
+
+      if (spinCount === 0) {
+        faces.neutral.style.display = "block";
+      } else if (spinCount === 1) {
+        faces.thinking.style.display = "block";
+      } else if (spinCount === 2) {
+        faces.excited.style.display = "block";
+      } else {
+        faces.angry.style.display = "block";
+      }
+    }
+    </script>
   <style>
     body {
       font-family: 'Bubblegum Sans', cursive;
@@ -56,7 +105,7 @@
       display: block;
       transition: transform 0.5s ease;
     }
-    .labubu.spin {
+    .labubu.spin, .labubu.talk {animation: bounce 1s ease;}
       transform: rotate(20deg) scale(1.2);
     }
     #popup {
@@ -70,14 +119,33 @@
       border-radius: 12px;
       display: none;
     }
-  </style>
+  
+    @keyframes bounce {
+      0%   { transform: translateY(0); }
+      25%  { transform: translateY(-15px); }
+      50%  { transform: translateY(0); }
+      75%  { transform: translateY(-8px); }
+      100% { transform: translateY(0); }
+    }
+    </style>
 </head>
 <body>
 
   <h1>Labubu's Movie Picker</h1>
-  <img src="LabubuSticker.gif" alt="Labubu" class="labubu" id="labubu" />
+  
+    <div style="position: relative; width: 120px; height: 120px; margin: 0 auto;">
+      <img src="https://i.imgur.com/X2bV2WB.png" id="labubuNeutral" class="labubu" style="display: block; position: absolute; width: 100%;" />
+      <img src="https://i.imgur.com/Vb8yAvy.png" id="labubuExcited" class="labubu" style="display: none; position: absolute; width: 100%;" />
+      <img src="https://i.imgur.com/2MoZyRa.png" id="labubuThinking" class="labubu" style="display: none; position: absolute; width: 100%;" />
+      <img src="https://i.imgur.com/kD0M1cE.png" id="labubuAngry" class="labubu" style="display: none; position: absolute; width: 100%;" />
+    </div>
+    <div id="moodMeter" style="width: 80%; max-width: 300px; height: 20px; border: 2px solid #cc66aa; border-radius: 10px; margin-top: 10px;">
+      <div id="moodFill" style="height: 100%; width: 0%; background: linear-gradient(to right, #66ccff, #ffcc00, #ff3366); border-radius: 10px;"></div>
+    </div>
+    
 
   <div class="slot" id="movieSlot">Ready to spin?</div>
+<p id="labubuMessage" style="font-size:1.2rem; color:#cc0066; max-width: 90%; margin-top: 10px;"></p>
   <button onclick="spinSlot()">Spin Movie!</button>
   <button onclick="spinAgain()" id="spinAgainBtn" style="display:none;">Spin Again</button>
 
@@ -86,17 +154,22 @@
   <audio id="spinSound" preload="auto">
     <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_233a1dddc0.mp3?filename=pop-94319.mp3" type="audio/mpeg">
   </audio>
+  <audio id="labubuVoice" preload="auto">
+    <source src="https://cdn.pixabay.com/download/audio/2022/07/25/audio_c9bba9f0fc.mp3?filename=funny-voice-112447.mp3" type="audio/mpeg">
+  </audio>
   <audio id="winSound" preload="auto">
     <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_277ea93c65.mp3?filename=success-bell-94320.mp3" type="audio/mpeg">
   </audio>
+  <audio id="labubuVoice" preload="auto">
+    <source src="https://cdn.pixabay.com/download/audio/2022/07/25/audio_c9bba9f0fc.mp3?filename=funny-voice-112447.mp3" type="audio/mpeg">
+  </audio>
 
   <script>
-    const movies = ["Blue", "Kingdom of Heaven", "Repo Man", "Indiana Jones", "Coherence", "Vivarium", "Kes", "Apartment 7A", "The Professional", "All of Us Strangers", "The Ascent", "La Chimera", "To Live & Die in LA", "Sorcerer", "The draftsman’s contract", "Virgin Suicides", "The straight story", "I Am", "Tangerine", "The Beasts", "Dream Scenario", "Monster", "A Ghost Story", "Cats", "Orlando", "The Tempest (1979)", "The Tempest", "When Evil Lurks", "Daughters of darkness", "They shoot horses don’t they", "Rob Roy", "The Mission", "Calls", "Alien", "Pinocchio", "Wednesday", "Force Majeure", "Athena", "Man on Wire", "Inside", "The Eternal Daughter", "Cabaret", "Legend", "Chinatown", "Room", "Midnight Cowboy", "Persona", "Wild Strawberries", "Mirror", "A Rainy Day in New York", "Muppets Take Manhattan", "El Topo", "Death in Venice", "Moulin rouge", "Woman in The Dunes", "Sans Soleil", "Fury Road", "Holy Motors", "Daughters of darkness", "I walked with a zombie", "Enter the Void", "Knives Out", "The Square", "All the Beauty and the Bloodshed", "Moonage Daydream", "The Whale", "Bones and All", "Mr Lonely", "Vengeance Trilogy", "Amadeus", "Jurassic park", "Xtron", "Eureka", "The Game", "mission impossible", "The future", "The man who fell to earth", "The worst person in the world", "Perfect Blue", "Mary Magdalene", "Color me Kubrick", "Dreams", "Cinema paradiso", "Crazy", "La Jetee", "Magnolia", "Super Mario Bros", "Return to Oz", "Black Moon (1975)", "The Hourglass Sanatorium", "Lion", "The Pope’s Exorcist", "Afterlife (1998)", "Your Name", "Perfect Blue", "Phantom of The Paradise", "The Square", "Dogtooth", "Grey Gardens", "Chungking Express", "Dressed to Kill", "Body heat", "Crimes of passion", "The bedroom window", "Call me", "Colour of the night", "Fleshtone", "Raging Bull", "Deer hunter", "The wrestler", "Magnolia", "Nightcrawler", "Spirited Away", "Down By Law", "Night on Earth", "Limits of Control", "Permanent Vacation", "After Hours", "Robocop", "The dead don’t die", "The crow", "Fist full of dollars", "The Twilight Trilogy", "The Future", "One From The Heart", "Beau’s Afraid", "A band called death", "Kedi", "Wings of desire", "Cemetery Man", "Napoleon", "Anatomy of a Fall", "Titus", "Kinetta", "Alps", "Inhérent vice", "The Duke of burgundy", "Bad lieutenant", "Blow out", "La jetée", "Pig", "Streets of fire", "The Stepford Wives", "Anselm", "Rat catcher", "In the mouth of madness", "Anatomy of a fall", "Killers of the flower moon", "The cure for insomnia", "Days of Heaven", "Bad lands", "Polytechnique", "Never let me go", "The name of the rose", "The seventh seal", "Green knight", "The good, the bad and the ugly", "The Eve of Ivan Kupalo", "Fargo", "Death becomes her", "Watership down", "Animal farm", "Roma", "The great dictator"];
+    const movies = ["Blue","Kingdom of Heaven","Repo Man","Indiana Jones","Coherence","Vivarium","Kes","Apartment 7A","The Professional","All of Us Strangers","The Ascent","La Chimera","To Live & Die in LA","Sorcerer","The draftsman’s contract","Virgin Suicides","The straight story","I Am","Tangerine","The Beasts","Dream Scenario","Monster","A Ghost Story","Cats","Orlando","The Tempest (1979)","The Tempest","When Evil Lurks","Daughters of darkness","They shoot horses don’t they","Rob Roy","The Mission","Calls","Alien","Pinocchio","Wednesday","Force Majeure","Athena","Man on Wire","Inside","The Eternal Daughter","Cabaret","Legend","Chinatown","Room","Midnight Cowboy","Persona","Wild Strawberries","Mirror","A Rainy Day in New York","Muppets Take Manhattan","El Topo","Death in Venice","Moulin rouge","Woman in The Dunes","Sans Soleil","Fury Road","Holy Motors","Daughters of darkness","I walked with a zombie","Enter the Void","Knives Out","The Square","All the Beauty and the Bloodshed","Moonage Daydream","The Whale","Bones and All","Mr Lonely","Vengeance Trilogy","Amadeus","Jurassic park","Xtron","Eureka","The Game","mission impossible","The future","The man who fell to earth","The worst person in the world","Perfect Blue","Mary Magdalene","Color me Kubrick","Dreams","Cinema paradiso","Crazy","La Jetee","Magnolia","Super Mario Bros","Return to Oz","Black Moon (1975)","The Hourglass Sanatorium","Lion","The Pope’s Exorcist","Afterlife (1998)","Your Name","Perfect Blue","Phantom of The Paradise","The Square","Dogtooth","Grey Gardens","Chungking Express","Dressed to Kill","Body heat","Crimes of passion","The bedroom window","Call me","Colour of the night","Fleshtone","Raging Bull","Deer hunter","The wrestler","Magnolia","Nightcrawler","Spirited Away","Down By Law","Night on Earth","Limits of Control","Permanent Vacation","After Hours","Robocop","The dead don’t die","The crow","Fist full of dollars","The Twilight Trilogy","The Future","One From The Heart","Beau’s Afraid","A band called death","Kedi","Wings of desire","Cemetery Man","Napoleon","Anatomy of a Fall","Titus","Kinetta","Alps","Inhérent vice","The Duke of burgundy","Bad lieutenant","Blow out","La jetée","Pig","Streets of fire","The Stepford Wives","Anselm","Rat catcher","In the mouth of madness","Anatomy of a fall","Killers of the flower moon","The cure for insomnia","Days of Heaven","Bad lands","Polytechnique","Never let me go","The name of the rose","The seventh seal","Green knight","The good, the bad and the ugly","The Eve of Ivan Kupalo","Fargo","Death becomes her","Watership down","Animal farm","Roma","The great dictator"];
     let currentMovie = "";
     let spinCount = 0;
     const maxSpins = 3;
 
-    // Ensure sound plays after user interaction
     let hasInteracted = false;
     document.body.addEventListener('click', () => {
       if (!hasInteracted) {
@@ -108,6 +181,12 @@
 
     function spinSlot() {
       document.getElementById('popup').style.display = "none";
+      updateLabubuMessage();
+      updateMood();
+      updateLabubuFace();
+      document.getElementById("labubu").classList.add("talk");
+      setTimeout(() => document.getElementById("labubu").classList.remove("talk"), 1000);
+      playLabubuVoice();
       const display = document.getElementById('movieSlot');
       const spinSound = document.getElementById('spinSound');
       const winSound = document.getElementById('winSound');
@@ -122,19 +201,31 @@
         currentMovie = randomMovie;
         count++;
         if (count > 30) {
+          if (spinCount >= maxSpins - 1) { document.querySelector("button[onclick='spinSlot()']").disabled = true; }
           clearInterval(interval);
           labubu.classList.remove('spin');
           winSound.play();
           confetti();
           showPopup(currentMovie);
-          document.getElementById('spinAgainBtn').style.display = (spinCount < maxSpins - 1) ? "inline-block" : "none";
           spinCount++;
+          updateLabubuMessage();
+      updateMood();
+      updateLabubuFace();
+      document.getElementById("labubu").classList.add("talk");
+      setTimeout(() => document.getElementById("labubu").classList.remove("talk"), 1000);
+      playLabubuVoice();;
+          if (spinCount < maxSpins) {
+            document.getElementById('spinAgainBtn').style.display = "inline-block";
+          } else {
+            document.getElementById('spinAgainBtn').style.display = "none";
+          }
         }
       }, 100);
     }
 
     function spinAgain() {
       if (spinCount >= maxSpins) {
+        document.getElementById("labubuMessage").innerText = "💬 Labubu says: I’ve made a pick for you! You must watch it now, teehee! 🎉";
         alert("You've reached the max of 3 spins! Time to watch: " + currentMovie);
         return;
       }
@@ -149,6 +240,55 @@
         </a>`;
       popup.style.display = "block";
     }
-  </script>
+  
+    function updateLabubuMessage() {
+      const msg = document.getElementById("labubuMessage");
+      if (spinCount === 0) {
+        msg.innerText = "💬 Labubu says: Let's pick a movie! 🎲";
+      } else if (spinCount === 1) {
+        msg.innerText = "💬 Labubu says: That was fun! Wanna spin again?";
+      } else if (spinCount === 2) {
+        msg.innerText = "💬 Labubu says: Last chance! Choose wisely... 🧐";
+      }
+    }
+    updateLabubuMessage();
+      updateMood();
+      updateLabubuFace();
+      document.getElementById("labubu").classList.add("talk");
+      setTimeout(() => document.getElementById("labubu").classList.remove("talk"), 1000);
+      playLabubuVoice();
+    
+    function playLabubuVoice() {
+      const voice = document.getElementById("labubuVoice");
+      voice.currentTime = 0;
+      voice.play();
+    }
+    
+    function updateMood() {
+      const fill = document.getElementById("moodFill");
+      const percent = (spinCount / maxSpins) * 100;
+      fill.style.width = percent + "%";
+    }
+
+    function updateLabubuFace() {
+      const faces = {
+        neutral: document.getElementById("labubuNeutral"),
+        excited: document.getElementById("labubuExcited"),
+        thinking: document.getElementById("labubuThinking"),
+        angry: document.getElementById("labubuAngry"),
+      };
+      Object.values(faces).forEach(img => img.style.display = "none");
+
+      if (spinCount === 0) {
+        faces.neutral.style.display = "block";
+      } else if (spinCount === 1) {
+        faces.thinking.style.display = "block";
+      } else if (spinCount === 2) {
+        faces.excited.style.display = "block";
+      } else {
+        faces.angry.style.display = "block";
+      }
+    }
+    </script>
 </body>
 </html>
