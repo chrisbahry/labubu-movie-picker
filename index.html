@@ -18,8 +18,6 @@
       }
     }
     updateLabubuMessage();
-      updateMood();
-      updateLabubuFace();
       document.getElementById("labubu").classList.add("talk");
       setTimeout(() => document.getElementById("labubu").classList.remove("talk"), 1000);
       playLabubuVoice();
@@ -28,32 +26,6 @@
       const voice = document.getElementById("labubuVoice");
       voice.currentTime = 0;
       voice.play();
-    }
-    
-    function updateMood() {
-      const fill = document.getElementById("moodFill");
-      const percent = (spinCount / maxSpins) * 100;
-      fill.style.width = percent + "%";
-    }
-
-    function updateLabubuFace() {
-      const faces = {
-        neutral: document.getElementById("labubuNeutral"),
-        excited: document.getElementById("labubuExcited"),
-        thinking: document.getElementById("labubuThinking"),
-        angry: document.getElementById("labubuAngry"),
-      };
-      Object.values(faces).forEach(img => img.style.display = "none");
-
-      if (spinCount === 0) {
-        faces.neutral.style.display = "block";
-      } else if (spinCount === 1) {
-        faces.thinking.style.display = "block";
-      } else if (spinCount === 2) {
-        faces.excited.style.display = "block";
-      } else {
-        faces.angry.style.display = "block";
-      }
     }
     </script>
   <style>
@@ -132,17 +104,7 @@
 <body>
 
   <h1>Labubu's Movie Picker</h1>
-  
-    <div style="position: relative; width: 120px; height: 120px; margin: 0 auto;">
-      <img src="https://i.imgur.com/X2bV2WB.png" id="labubuNeutral" class="labubu" style="display: block; position: absolute; width: 100%;" />
-      <img src="https://i.imgur.com/Vb8yAvy.png" id="labubuExcited" class="labubu" style="display: none; position: absolute; width: 100%;" />
-      <img src="https://i.imgur.com/2MoZyRa.png" id="labubuThinking" class="labubu" style="display: none; position: absolute; width: 100%;" />
-      <img src="https://i.imgur.com/kD0M1cE.png" id="labubuAngry" class="labubu" style="display: none; position: absolute; width: 100%;" />
-    </div>
-    <div id="moodMeter" style="width: 80%; max-width: 300px; height: 20px; border: 2px solid #cc66aa; border-radius: 10px; margin-top: 10px;">
-      <div id="moodFill" style="height: 100%; width: 0%; background: linear-gradient(to right, #66ccff, #ffcc00, #ff3366); border-radius: 10px;"></div>
-    </div>
-    
+  <img src="LabubuSticker.gif" alt="Labubu" class="labubu" id="labubu" />
 
   <div class="slot" id="movieSlot">Ready to spin?</div>
 <p id="labubuMessage" style="font-size:1.2rem; color:#cc0066; max-width: 90%; margin-top: 10px;"></p>
@@ -182,8 +144,6 @@
     function spinSlot() {
       document.getElementById('popup').style.display = "none";
       updateLabubuMessage();
-      updateMood();
-      updateLabubuFace();
       document.getElementById("labubu").classList.add("talk");
       setTimeout(() => document.getElementById("labubu").classList.remove("talk"), 1000);
       playLabubuVoice();
@@ -201,7 +161,6 @@
         currentMovie = randomMovie;
         count++;
         if (count > 30) {
-          if (spinCount >= maxSpins - 1) { document.querySelector("button[onclick='spinSlot()']").disabled = true; }
           clearInterval(interval);
           labubu.classList.remove('spin');
           winSound.play();
@@ -209,8 +168,6 @@
           showPopup(currentMovie);
           spinCount++;
           updateLabubuMessage();
-      updateMood();
-      updateLabubuFace();
       document.getElementById("labubu").classList.add("talk");
       setTimeout(() => document.getElementById("labubu").classList.remove("talk"), 1000);
       playLabubuVoice();;
@@ -252,8 +209,6 @@
       }
     }
     updateLabubuMessage();
-      updateMood();
-      updateLabubuFace();
       document.getElementById("labubu").classList.add("talk");
       setTimeout(() => document.getElementById("labubu").classList.remove("talk"), 1000);
       playLabubuVoice();
@@ -262,32 +217,6 @@
       const voice = document.getElementById("labubuVoice");
       voice.currentTime = 0;
       voice.play();
-    }
-    
-    function updateMood() {
-      const fill = document.getElementById("moodFill");
-      const percent = (spinCount / maxSpins) * 100;
-      fill.style.width = percent + "%";
-    }
-
-    function updateLabubuFace() {
-      const faces = {
-        neutral: document.getElementById("labubuNeutral"),
-        excited: document.getElementById("labubuExcited"),
-        thinking: document.getElementById("labubuThinking"),
-        angry: document.getElementById("labubuAngry"),
-      };
-      Object.values(faces).forEach(img => img.style.display = "none");
-
-      if (spinCount === 0) {
-        faces.neutral.style.display = "block";
-      } else if (spinCount === 1) {
-        faces.thinking.style.display = "block";
-      } else if (spinCount === 2) {
-        faces.excited.style.display = "block";
-      } else {
-        faces.angry.style.display = "block";
-      }
     }
     </script>
 </body>
