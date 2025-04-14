@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Labubu Movie Picker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/zarocknz/javascript-winwheel@latest/Winwheel.min.js"></script>
+  <style>
+    body {
+      font-family: 'Bubblegum Sans', cursive;
+      background: linear-gradient(to bottom, #ffccff, #ffe6f2);
+      color: #333;
+      text-align: center;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #ff3399;
+      font-size: 3rem;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      background: #ff66b2;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .toggle-buttons {
+      margin-bottom: 30px;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .active {
+      display: block;
+    }
+
+    .slot {
+      font-size: 2rem;
+      padding: 1rem;
+      border: 4px dashed #ff99cc;
+      background: #fff0f5;
+      margin: 20px auto;
+      width: 60%;
+      border-radius: 20px;
+    }
+
+    canvas {
+      margin-top: 20px;
+    }
+
+    .labubu {
+      width: 100px;
+      margin: 20px auto;
+      display: block;
+    }
+  </style>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+  <h1>Labubu's Movie Picker</h1>
+  <img src="LabubuSticker.gif" alt="Labubu" class="labubu" />
+
+  <div class="toggle-buttons">
+    <button onclick="showSection('slotMachine')">Slot Machine</button>
+    <button onclick="showSection('wheelSpinner')">Spinning Wheel</button>
+  </div>
+
+  <div class="section active" id="slotMachine">
+    <div class="slot" id="movieSlot">Press Spin</div>
+    <button onclick="spinSlot()">Spin Movie!</button>
+  </div>
+
+  <div class="section" id="wheelSpinner">
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <br>
+    <button onclick="spinWheel()">Spin the Wheel</button>
+    <p id="result" style="margin-top: 20px; font-size: 1.5rem; color: #cc0066;"></p>
+  </div>
+
+  <audio id="spinSound" src="https://assets.mixkit.co/sfx/preview/mixkit-game-ball-tap-2073.mp3"></audio>
+  <audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3"></audio>
+
+  <script>
+    const movies = ["Blue", "Kingdom of Heaven", "Repo Man", "Indiana Jones", "Coherence", "Vivarium", "Kes", "Apartment 7A", "The Professional", "All of Us Strangers", "The Ascent", "La Chimera", "To Live & Die in LA", "Sorcerer", "Virgin Suicides", "Dream Scenario", "Fury Road", "Perfect Blue", "Enter the Void", "Roma"];
+
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function spinSlot() {
+      const spinSound = document.getElementById('spinSound');
+      const winSound = document.getElementById('winSound');
+      const display = document.getElementById('movieSlot');
+      let count = 0;
+      spinSound.play();
+
+      const interval = setInterval(() => {
+        const randomMovie = movies[Math.floor(Math.random() * movies.length)];
+        display.textContent = randomMovie;
+        count++;
+        if (count > 30) {
+          confetti();
+          clearInterval(interval);
+          winSound.play(); confetti();
+        }
+      }, 100);
+    }
+
+    const wheel = new Winwheel({
+      canvasId: 'canvas',
+      numSegments: movies.length,
+      segments: movies.map(m => ({ text: m })),
+      animation: {
+        type: 'spinToStop',
+        duration: 6,
+        spins: 8,
+        callbackFinished: displayResult
+      }
+    });
+
+    function spinWheel() {
+      document.getElementById('spinSound').play();
+      wheel.stopAnimation(false);
+      wheel.rotationAngle = 0;
+      wheel.draw();
+      wheel.startAnimation();
+    }
+
+    function displayResult(indicatedSegment) {
+      document.getElementById('winSound').play();
+      document.getElementById('result').textContent = `You should watch: "${indicatedSegment.text}"`;
+    }
+  </script>
+
+</body>
+</html>
