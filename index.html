@@ -250,7 +250,8 @@ document.body.addEventListener('click', () => {
       document.getElementById("popup").style.display = "none";
       playSound("spinSound");
       updateLabubuFace();
-      updateLabubuMessage();
+      if (spinCount < maxSpins - 1) { confetti(); }
+          updateLabubuMessage();
       updateMood();
       updateButtonLabel();
 
@@ -265,6 +266,7 @@ document.body.addEventListener('click', () => {
                               showPopup(currentMovie);
           spinCount++;
           updateLabubuFace();
+          if (spinCount < maxSpins - 1) { confetti(); }
           updateLabubuMessage();
           updateMood();
           updateButtonLabel();
