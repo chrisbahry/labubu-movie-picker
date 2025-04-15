@@ -5,27 +5,45 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Labubu Movie Picker</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
+    @font-face {
+      font-family: 'Chewy Bubble';
+      src: url('Chewy Bubble.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
     body {
-      font-family: 'Bubblegum Sans', cursive;
+      font-family: 'Chewy Bubble', cursive;
       background: linear-gradient(to bottom, #ffccff, #ffe6f2);
-      color: #333;
+      color: #ff3399;
       text-align: center;
       padding: 40px;
       margin: 0;
-      height: 100%;
       display: flex;
-      justify-content: center;
-      align-items: center;
       flex-direction: column;
+      align-items: center;
     }
+
     h1 {
-      color: #ff3399;
       font-size: 2.5rem;
       margin-bottom: 20px;
     }
+
+    .slot {
+      font-size: 2rem;
+      padding: 1.5rem;
+      border: 4px dashed #ff99cc;
+      background: #fff0f5;
+      margin: 20px auto;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 20px;
+      min-height: 70px;
+      text-align: center;
+      color: #ff3399;
+    }
+
     button {
       padding: 15px 30px;
       margin: 10px;
@@ -37,46 +55,11 @@
       border-radius: 10px;
       box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
     }
-    .slot {
-      font-size: 2rem;
-      padding: 1rem;
-      border: 4px dashed #ff99cc;
-      background: #fff0f5;
-      margin: 20px auto;
-      width: 80%;
-      max-width: 400px;
-      border-radius: 20px;
-      min-height: 70px;
-    }
-    .labubu-img {
-      width: 160px;
-      margin: 0 auto;
-      display: none;
-    }
-    #moodMeter {
-      width: 80%;
-      max-width: 300px;
-      height: 20px;
-      border: 2px solid #cc66aa;
-      border-radius: 10px;
-      margin-top: 10px;
-    }
-    #moodFill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(to right, #66ccff, #ffcc00, #ff3366);
-      border-radius: 10px;
-    }
-    #popup {
-      background: #fff;
-      color: #000;
-      border: 3px solid #ff66b2;
-      padding: 20px;
-      margin: 20px auto;
-      width: 80%;
-      max-width: 400px;
-      border-radius: 12px;
-      display: none;
+
+    #labubuMessage {
+      font-size: 1.1rem;
+      color: #ff3399;
+      margin: 12px auto;
     }
   </style>
 </head>
@@ -84,125 +67,10 @@
 
   <h1>Labubu's Movie Picker</h1>
 
-  <div id="labubuFaces">
-    <img src="LabubuNeutral.png" id="faceNeutral" class="labubu-img" style="display:block;" />
-    <img src="LabubuThinking.png" id="faceThinking" class="labubu-img" />
-    <img src="LabubuExcited.png" id="faceExcited" class="labubu-img" />
-    <img src="LabubuAngry.png" id="faceAngry" class="labubu-img" />
-  </div>
-
-  <div id="moodMeter">
-    <div id="moodFill"></div>
-  </div>
+  <p id="labubuMessage">💬 Labubu says: Let's pick a movie! 🎲</p>
 
   <div class="slot" id="movieSlot">Ready to spin?</div>
-  <p id="labubuMessage" style="font-size:1.1rem; color:#cc0066;"></p>
-  <button onclick="spinSlot()" id="spinBtn">Spin Movie!</button>
-  <button onclick="spinAgain()" id="spinAgainBtn" style="display:none;">Spin Again</button>
+  <button>Spin Movie!</button>
 
-  <div id="popup"></div>
-
-  <audio id="spinSound" src="spinSound.mp3" preload="auto"></audio>
-  <audio id="winSound" src="winSound.mp3" preload="auto"></audio>
-  <audio id="labubuVoice" src="labubuVoice.mp3" preload="auto"></audio>
-
-  <script>
-    const movies = ["Blue", "Kingdom of Heaven", "Repo Man", "Indiana Jones", "Coherence", "Vivarium", "Kes", "Apartment 7A", "The Professional", "All of Us Strangers", "The Ascent", "La Chimera", "To Live & Die in LA", "Sorcerer", "The draftsman’s contract", "Virgin Suicides", "The straight story", "I Am", "Tangerine", "The Beasts", "Dream Scenario", "Monster", "A Ghost Story", "Cats", "Orlando", "The Tempest (1979)", "The Tempest", "When Evil Lurks", "Daughters of darkness", "They shoot horses don’t they", "Rob Roy", "The Mission", "Calls", "Alien", "Pinocchio", "Wednesday", "Force Majeure", "Athena", "Man on Wire", "Inside", "The Eternal Daughter", "Cabaret", "Legend", "Chinatown", "Room", "Midnight Cowboy", "Persona", "Wild Strawberries", "Mirror", "A Rainy Day in New York", "Muppets Take Manhattan", "El Topo", "Death in Venice", "Moulin rouge", "Woman in The Dunes", "Sans Soleil", "Fury Road", "Holy Motors", "I walked with a zombie", "Enter the Void", "Knives Out", "The Square", "All the Beauty and the Bloodshed", "Moonage Daydream", "The Whale", "Bones and All", "Mr Lonely", "Vengeance Trilogy", "Amadeus", "Jurassic park", "Xtron", "Eureka", "The Game", "mission impossible", "The future", "The man who fell to earth", "The worst person in the world", "Perfect Blue", "Mary Magdalene", "Color me Kubrick", "Dreams", "Cinema paradiso", "Crazy", "La Jetee", "Magnolia", "Super Mario Bros", "Return to Oz", "Black Moon (1975)", "The Hourglass Sanatorium", "Lion", "The Pope’s Exorcist", "Afterlife (1998)", "Your Name", "Phantom of The Paradise", "Dogtooth", "Grey Gardens", "Chungking Express", "Dressed to Kill", "Body heat", "Crimes of passion", "The bedroom window", "Call me", "Colour of the night", "Fleshtone", "Raging Bull", "Deer hunter", "The wrestler", "Nightcrawler", "Spirited Away", "Down By Law", "Night on Earth", "Limits of Control", "Permanent Vacation", "After Hours", "Robocop", "The dead don’t die", "The crow", "Fist full of dollars", "The Twilight Trilogy", "One From The Heart", "Beau’s Afraid", "A band called death", "Kedi", "Wings of desire", "Cemetery Man", "Napoleon", "Anatomy of a Fall", "Titus", "Kinetta", "Alps", "Inhérent vice", "The Duke of burgundy", "Bad lieutenant", "Blow out", "Pig", "Streets of fire", "The Stepford Wives", "Anselm", "Rat catcher", "In the mouth of madness", "Killers of the flower moon", "The cure for insomnia", "Days of Heaven", "Bad lands", "Polytechnique", "Never let me go", "The name of the rose", "The seventh seal", "Green knight", "The good, the bad and the ugly", "The Eve of Ivan Kupalo", "Fargo", "Death becomes her", "Watership down", "Animal farm", "Roma", "The great dictator"];
-    let spinCount = 0;
-    const maxSpins = 3;
-    let currentMovie = "";
-
-    function updateLabubuFace() {
-      const faces = ["Neutral", "Thinking", "Excited", "Angry"];
-      faces.forEach(face => document.getElementById("face" + face).style.display = "none");
-      if (spinCount === 0) {
-        document.getElementById("faceNeutral").style.display = "block";
-      } else if (spinCount === 1) {
-        document.getElementById("faceThinking").style.display = "block";
-      } else if (spinCount === 2) {
-        document.getElementById("faceExcited").style.display = "block";
-      } else {
-        document.getElementById("faceAngry").style.display = "block";
-      }
-    }
-
-    function updateLabubuMessage() {
-      const msg = document.getElementById("labubuMessage");
-      if (spinCount === 0) {
-        msg.innerText = "💬 Labubu says: Let's pick a movie! 🎲";
-      } else if (spinCount === 1) {
-        msg.innerText = "💬 Labubu says: That was fun! Wanna spin again?";
-      } else if (spinCount === 2) {
-        msg.innerText = "💬 Labubu says: Last chance! Choose wisely... 🧐";
-      } else {
-        msg.innerText = "💬 Labubu says: I’ve made a pick for you! You must watch it now, teehee! 🎉";
-      }
-    }
-
-    function updateMood() {
-      const fill = document.getElementById("moodFill");
-      const percent = Math.min((spinCount / maxSpins) * 100, 100);
-      fill.style.width = percent + "%";
-    }
-
-    function playSound(id) {
-      const sound = document.getElementById(id);
-      sound.currentTime = 0;
-      sound.play();
-    }
-
-    function spinSlot() {
-      const display = document.getElementById("movieSlot");
-      document.getElementById("popup").style.display = "none";
-      playSound("spinSound");
-      updateLabubuFace();
-      updateLabubuMessage();
-      updateMood();
-
-      let count = 0;
-      const interval = setInterval(() => {
-        const randomMovie = movies[Math.floor(Math.random() * movies.length)];
-        display.textContent = randomMovie;
-        currentMovie = randomMovie;
-        count++;
-        if (count > 30) {
-          clearInterval(interval);
-          playSound("winSound");
-          confetti();
-          showPopup(currentMovie);
-          spinCount++;
-          updateLabubuFace();
-          updateLabubuMessage();
-          updateMood();
-
-          if (spinCount < maxSpins) {
-            document.getElementById("spinAgainBtn").style.display = "inline-block";
-          } else {
-            document.getElementById("spinBtn").disabled = true;
-            document.getElementById("spinAgainBtn").style.display = "none";
-          }
-
-          playSound("labubuVoice");
-        }
-      }, 100);
-    }
-
-    function spinAgain() {
-      if (spinCount >= maxSpins) {
-        alert("Labubu has already picked for you: " + currentMovie);
-        return;
-      }
-      spinSlot();
-    }
-
-    function showPopup(movie) {
-      const popup = document.getElementById('popup');
-      popup.innerHTML = `<strong>You should watch:</strong> <em>${movie}</em><br><br>
-        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(movie + ' trailer')}" target="_blank">
-          🎬 Watch Trailer
-        </a>`;
-      popup.style.display = "block";
-    }
-  </script>
 </body>
 </html>
