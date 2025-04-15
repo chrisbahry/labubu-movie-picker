@@ -270,6 +270,7 @@
     function showPopup(movie) {
       const popup = document.getElementById('popup');
       popup.innerHTML = `<strong>You should watch:</strong> <em>${movie}</em><br><br>
+    <button onclick="markWatched('${movie}')">✅ Mark as Watched</button><br><br>
         <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(movie + ' trailer')}" target="_blank">
           🎬 Watch Trailer
         </a>`;
@@ -290,6 +291,7 @@
     <textarea id="movieEditor" rows="10" style="width: 90%; max-width: 500px; font-family: monospace;"></textarea><br>
     <button onclick="saveMovieList()">Save List</button>
     <button onclick="resetMovieList()">Reset to Default</button>
+    <button onclick="clearWatched()">Clear Watched Movies</button>
   </div>
 
   <script>
@@ -315,6 +317,12 @@
     function resetMovieList() {
       localStorage.removeItem("customMovieList");
       alert("Movie list reset to default! Reload the page.");
+    }
+
+    
+    function clearWatched() {
+      localStorage.removeItem("watchedMovies");
+      alert("Watched movies cleared! Previously watched movies may now appear again.");
     }
 
     function markWatched(movie) {
