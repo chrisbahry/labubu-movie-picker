@@ -132,7 +132,30 @@
       0%   { transform: translateY(0) scale(1); opacity: 1; }
       100% { transform: translateY(-80px) scale(1.5); opacity: 0; }
     }
-  </style>
+  
+#movieEditorBox {
+  background: #fff;
+  color: #ff3399;
+  border: 3px solid #ff66b2;
+  padding: 20px;
+  margin: 20px auto;
+  width: 80%;
+  max-width: 500px;
+  border-radius: 12px;
+  display: block;
+}
+#movieEditor {
+  width: 100%;
+  font-family: monospace;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+</style>
 </head>
 <body>
 
@@ -286,7 +309,7 @@
     }
   </script>
 
-  <div style="margin-top: 30px;">
+  <div id="movieEditorBox">
     <h2>Edit Movie List</h2>
     <textarea id="movieEditor" rows="10" style="width: 90%; max-width: 500px; font-family: monospace;"></textarea><br>
     <button onclick="saveMovieList()">Save List</button>
