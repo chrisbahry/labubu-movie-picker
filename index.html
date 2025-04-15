@@ -4,316 +4,285 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Labubu Movie Picker (Watched)</title>
+  <title>Labubu Movie Picker</title>
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 2em;
-      background-color: #fff0f5;
-      color: #ff3399;
+    @font-face {
+      font-family: 'Chewy Bubble';
+      src: url('ChewyBubble.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
     }
+
+    body {
+      font-family: 'Chewy Bubble', cursive;
+      background: linear-gradient(to bottom, #ffccff, #ffe6f2);
+      color: #ff3399;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
     h1 {
       font-size: 2rem;
-      margin-bottom: 1em;
+      margin-bottom: 20px;
+      font-family: 'Chewy Bubble', cursive;
     }
-    #movieSlot {
+
+    .slot {
       font-size: 1.5rem;
-      margin: 20px 0;
-      padding: 10px;
-      border: 3px solid #ff3399;
-      border-radius: 10px;
+      padding: 1.5rem;
+      border: 4px dashed #ff99cc;
+      background: #fff0f5;
+      margin: 20px auto;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 20px;
+      min-height: 70px;
+      text-align: center;
+      color: #ff3399;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+
     button {
-      background: #ff3399;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
+      padding: 12px 20px;
+      margin: 10px;
       font-size: 1rem;
       cursor: pointer;
-      margin: 5px;
+      background: #ff66b2;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
     }
-    button:hover {
-      background: #ff66aa;
+
+    .labubu-img {
+      width: 160px;
+      margin: 0 auto;
+      display: none;
     }
-    #movieCount {
+
+    #labubuMessage {
+      font-size: 1.1rem;
+      color: #ff3399;
+      margin: 12px auto;
+    }
+
+    #moodMeter {
+      width: 80%;
+      max-width: 300px;
+      height: 20px;
+      border: 2px solid #cc66aa;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    #moodFill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(to right, #66ccff, #ffcc00, #ff3366);
+      border-radius: 10px;
+    }
+
+    #popup {
+      background: #fff;
+      color: #ff3399;
+      border: 3px solid #ff66b2;
+      padding: 20px;
+      margin: 20px auto;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 12px;
+      display: none;
+    }
+
+    #popup a {
+      color: #ff3399;
       font-weight: bold;
-      margin-bottom: 10px;
+    }
+
+    .puff {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #ccc;
+      border-radius: 50%;
+      opacity: 0.7;
+      animation: puffAnim 1s ease-out forwards;
+    }
+
+    @keyframes puffAnim {
+      0%   { transform: scale(1) translateY(0); opacity: 0.7; }
+      100% { transform: scale(3) translateY(-50px); opacity: 0; }
+    }
+
+    .question {
+      position: absolute;
+      font-size: 2rem;
+      color: #cc00cc;
+      animation: floatUp 1.2s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes floatUp {
+      0%   { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-80px) scale(1.5); opacity: 0; }
     }
   </style>
 </head>
 <body>
-  <h1>🎬 Labubu's Movie Picker</h1>
-  <p id="movieCount">Loading movie count...</p>
-  <div id="movieSlot">Press the button to spin!</div>
-  <div id="markWatchedArea">
-    </div>
 
-    <div style="margin-top: 30px;">
-      <h2>🎛️ Edit Movie List</h2>
-      <textarea id="movieEditor" rows="10" style="width:90%; max-width: 500px; font-family: monospace; border-radius: 8px; padding: 10px;"></textarea><br>
-      <button onclick="saveMovieList()">💾 Save List</button>
-      <button onclick="resetMovieList()">🔁 Reset to Default</button>
-    </div>
+  <h1>Labubu's Movie Picker</h1>
 
-    <button onclick="spinMovie()">🎲 Spin Movie!</button>
-  <button onclick="clearWatched()">♻️ Clear Watched</button>
+  <div id="labubuFaces">
+    <img src="LabubuNeutral.png" id="faceNeutral" class="labubu-img" style="display:block;" />
+    <img src="LabubuThinking.png" id="faceThinking" class="labubu-img" />
+    <img src="LabubuExcited.png" id="faceExcited" class="labubu-img" />
+    <img src="LabubuAngry.png" id="faceAngry" class="labubu-img" />
+  </div>
 
+  <p id="labubuMessage">💬 Labubu says: Let's pick a movie! 🎲</p>
+
+  <div id="moodMeter"><div id="moodFill"></div></div>
+
+  <div class="slot" id="movieSlot">Ready to spin?</div>
+  <button onclick="spinSlot()" id="spinBtn">Spin Movie!</button>
+
+  <div id="popup"></div>
+
+  <audio id="spinSound" src="spinSound.mp3" preload="auto"></audio>
+  <audio id="labubuVoice" src="labubuVoice.mp3" preload="auto"></audio>
+  <audio id="labubuVoiceAngry" src="labubuVoiceAngry.mp3" preload="auto"></audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script>
-    const defaultMovies = [
-  "Blue",
-  "Kingdom of Heaven",
-  "Repo Man",
-  "Indiana Jones",
-  "Coherence",
-  "Vivarium",
-  "Kes",
-  "Apartment 7A",
-  "The Professional",
-  "All of Us Strangers",
-  "The Ascent",
-  "La Chimera",
-  "To Live & Die in LA",
-  "Sorcerer",
-  "The draftsman\u2019s contract",
-  "Virgin Suicides",
-  "The straight story",
-  "I Am",
-  "Tangerine",
-  "The Beasts",
-  "Dream Scenario",
-  "Monster",
-  "A Ghost Story",
-  "Cats",
-  "Orlando",
-  "The Tempest (1979)",
-  "When Evil Lurks",
-  "Daughters of darkness",
-  "They shoot horses don\u2019t they",
-  "Rob Roy",
-  "The Mission",
-  "Calls",
-  "Alien",
-  "Pinocchio",
-  "Wednesday",
-  "Force Majeure",
-  "Athena",
-  "Man on Wire",
-  "Inside",
-  "The Eternal Daughter",
-  "Cabaret",
-  "Legend",
-  "Room",
-  "Midnight Cowboy",
-  "Persona",
-  "Wild Strawberries",
-  "Mirror",
-  "A Rainy Day in New York",
-  "Muppets Take Manhattan",
-  "El Topo",
-  "Death in Venice",
-  "Moulin rouge",
-  "Woman in The Dunes",
-  "Sans Soleil",
-  "Fury Road",
-  "Holy Motors",
-  "Daughters of darkness",
-  "I walked with a zombie",
-  "Enter the Void",
-  "Knives Out",
-  "The Square",
-  "All the Beauty and the Bloodshed",
-  "Moonage Daydream",
-  "The Whale",
-  "Bones and All",
-  "Mr Lonely",
-  "Vengeance Trilogy",
-  "Amadeus",
-  "Jurassic park",
-  "Xtron",
-  "Eureka",
-  "The Game",
-  "mission impossible",
-  "The future",
-  "The man who fell to earth",
-  "The worst person in the world",
-  "Perfect Blue",
-  "Mary Magdalene",
-  "Color me Kubrick",
-  "Dreams",
-  "Cinema paradiso",
-  "Crazy",
-  "La Jetee",
-  "Magnolia",
-  "Super Mario Bros",
-  "Return to Oz",
-  "Black Moon (1975)",
-  "The Hourglass Sanatorium",
-  "Lion",
-  "The Pope\u2019s Exorcist",
-  "Afterlife (1998)",
-  "Your Name",
-  "Perfect Blue",
-  "Phantom of The Paradise (DePalma)",
-  "The Square",
-  "Dogtooth",
-  "Grey Gardens",
-  "Chungking Express",
-  "Dressed to Kill",
-  "Body heat",
-  "Crimes of passion",
-  "The bedroom window",
-  "Call me",
-  "Colour of the night",
-  "Fleshtone",
-  "Raging Bull",
-  "Deer hunter",
-  "The wrestler",
-  "Magnolia",
-  "Nightcrawler",
-  "Spirited Away",
-  "Down By Law",
-  "Night on Earth",
-  "Limits of Control",
-  "Permanent Vacation",
-  "After Hours",
-  "Robocop",
-  "The dead don\u2019t die",
-  "The crow",
-  "Fist full of dollars",
-  "The Twilight Trilogy",
-  "The Future",
-  "One From The Heart",
-  "Beau\u2019s Afraid",
-  "A band called death",
-  "Kedi",
-  "Wings of desire",
-  "Cemetery Man",
-  "Napoleon",
-  "Anatomy of a Fall",
-  "Titus",
-  "Kinetta",
-  "Alps",
-  "Inh\u00e9rent vice",
-  "The Duke of burgundy",
-  "Bad lieutenant",
-  "Blow out",
-  "La jet\u00e9e",
-  "Pig",
-  "Streets of fire",
-  "The Stepford Wives",
-  "Anselm",
-  "Rat catcher",
-  "In the mouth of madness",
-  "Anatomy of a fall",
-  "Killers of the flower moon",
-  "The cure for insomnia",
-  "Days of Heaven",
-  "Bad lands",
-  "Polytechnique",
-  "Never let me go",
-  "The name of the rose",
-  "The seventh seal",
-  "Green knight",
-  "The good, the bad and the ugly",
-  "The Eve of Ivan Kupalo",
-  "Fargo",
-  "Death becomes her",
-  "Watership down",
-  "Animal farm",
-  "Roma",
-  "The great dictator"
-];
-    let watched = JSON.parse(localStorage.getItem("watchedMovies") || "[]");
+    let movies = [];
+    let spinCount = 0;
+    const maxSpins = 3;
+    let currentMovie = "";
 
-    let customList = localStorage.getItem("customMovieList");
-
-    function getMovieList() {
-      const list = customList ? customList.split('\n').map(m => m.trim()).filter(Boolean) : defaultMovies.slice();
-      return list;
-    }
-
-    function updateAvailableMovies() {
-      availableMovies = getMovieList().filter(m => !watched.includes(m));
-    }
-
-    function saveMovieList() {
-      const raw = document.getElementById("movieEditor").value;
-      localStorage.setItem("customMovieList", raw);
-      customList = raw;
-      watched = [];
-      localStorage.removeItem("watchedMovies");
-      updateAvailableMovies();
-      updateCount();
-document.getElementById('movieEditor').value = customList ? customList : defaultMovies.join('\n');
-      alert("✅ List saved and watched list reset!");
-    }
-
-    function resetMovieList() {
-      localStorage.removeItem("customMovieList");
-      customList = null;
-      watched = [];
-      localStorage.removeItem("watchedMovies");
-      updateAvailableMovies();
-      updateCount();
-document.getElementById('movieEditor').value = customList ? customList : defaultMovies.join('\n');
-      document.getElementById("movieEditor").value = defaultMovies.join('\n');
-      alert("🔁 List reset to default and watched list cleared!");
-    }
-
-    let availableMovies = [];
-
-    function updateAvailableMovies() {
-      availableMovies = defaultMovies.filter(m => !watched.includes(m));
-    }
-
-    function updateCount() {
-      document.getElementById("movieCount").textContent = `🎞️ Available Movies: ${availableMovies.length}`;
-    }
-
-    function spinMovie() {
-      updateAvailableMovies();
-      updateCount();
-document.getElementById('movieEditor').value = customList ? customList : defaultMovies.join('\n');
-      const slot = document.getElementById("movieSlot");
-      const markArea = document.getElementById("markWatchedArea");
-
-      if (availableMovies.length === 0) {
-        slot.textContent = "🎉 You've watched everything!";
-        markArea.innerHTML = "";
-        return;
+    let audioUnlocked = false;
+    document.body.addEventListener('click', () => {
+      if (!audioUnlocked) {
+        ['labubuVoice', 'labubuVoiceAngry'].forEach(id => {
+          const el = document.getElementById(id);
+          el.play().then(() => {
+            el.pause();
+            el.currentTime = 0;
+          }).catch(() => {});
+        });
+        audioUnlocked = true;
       }
+    });
 
-      slot.textContent = "🎰 Spinning...";
-      markArea.innerHTML = "";
-      setTimeout(() => {
-        const movie = availableMovies[Math.floor(Math.random() * availableMovies.length)];
-        slot.textContent = `🎬 You should watch: ${movie}`;
-        markArea.innerHTML = `<button onclick="markAsWatched('${movie}')">✅ Mark as Watched</button>`;
-      }, 1000);
+    function updateLabubuFace() {
+      ["Neutral", "Thinking", "Excited", "Angry"].forEach(f => {
+        document.getElementById("face" + f).style.display = "none";
+      });
+      const state = spinCount === 0 ? "Neutral" : spinCount === 1 ? "Thinking" : spinCount === 2 ? "Excited" : "Angry";
+      document.getElementById("face" + state).style.display = "block";
     }
 
-    function markAsWatched(movie) {
-      watched.push(movie);
-      localStorage.setItem("watchedMovies", JSON.stringify(watched));
-      document.getElementById("markWatchedArea").innerHTML = "";
-      updateAvailableMovies();
-      updateCount();
-document.getElementById('movieEditor').value = customList ? customList : defaultMovies.join('\n');
+    function updateLabubuMessage() {
+      const msg = document.getElementById("labubuMessage");
+      msg.innerText =
+        spinCount === 0 ? "💬 Labubu says: Let's pick a movie! 🎲" :
+        spinCount === 1 ? "💬 Labubu says: That was fun! Wanna spin again?" :
+        spinCount === 2 ? "💬 Labubu says: Last chance! Choose wisely... 🧐" :
+        "💬 Labubu says: I’ve made a pick for you! You must watch it now, teehee! 🎉";
     }
 
-    function clearWatched() {
-      localStorage.removeItem("watchedMovies");
-      watched = [];
-      updateAvailableMovies();
-      updateCount();
-document.getElementById('movieEditor').value = customList ? customList : defaultMovies.join('\n');
+    function updateMood() {
+      const fill = document.getElementById("moodFill");
+      fill.style.width = Math.min((spinCount / maxSpins) * 100, 100) + "%";
     }
 
-    updateAvailableMovies();
-    updateCount();
-document.getElementById('movieEditor').value = customList ? customList : defaultMovies.join('\n');
+    function updateButtonLabel() {
+      const btn = document.getElementById("spinBtn");
+      btn.innerText = ["Spin Movie!", "Spin Again?", "Last Chance!", "No Spins Left"][spinCount] || "No Spins Left";
+      if (spinCount >= maxSpins) btn.disabled = true;
+    }
+
+    function showPuffs() {
+      for (let i = 0; i < 8; i++) {
+        const puff = document.createElement('div');
+        puff.className = 'puff';
+        puff.style.left = (50 + Math.random() * 30 - 15) + '%';
+        puff.style.top = (50 + Math.random() * 20 - 10) + '%';
+        document.body.appendChild(puff);
+        setTimeout(() => puff.remove(), 1000);
+      }
+    }
+
+    function showQuestions() {
+      for (let i = 0; i < 10; i++) {
+        const q = document.createElement('div');
+        q.className = 'question';
+        q.textContent = '?';
+        q.style.left = (10 + Math.random() * 80) + '%';
+        q.style.top = (60 + Math.random() * 20) + '%';
+        document.body.appendChild(q);
+        setTimeout(() => q.remove(), 1200);
+      }
+    }
+
+    function spinSlot() {
+      if (spinCount >= maxSpins) return;
+      showQuestions();
+      playSound("spinSound");
+      updateLabubuFace();
+      updateLabubuMessage();
+      updateMood();
+      updateButtonLabel();
+
+      const display = document.getElementById("movieSlot");
+      document.getElementById("popup").style.display = "none";
+
+      let count = 0;
+      const interval = setInterval(() => {
+        const randomMovie = movies[Math.floor(Math.random() * movies.length)];
+        display.textContent = randomMovie;
+        currentMovie = randomMovie;
+        count++;
+        if (count > 30) {
+          clearInterval(interval);
+          if (spinCount < maxSpins - 1) {
+            confetti();
+            playSound("labubuVoice");
+          } else {
+            showPuffs();
+            playSound("labubuVoiceAngry");
+          }
+          showPopup(currentMovie);
+          spinCount++;
+          updateLabubuFace();
+          updateLabubuMessage();
+          updateMood();
+          updateButtonLabel();
+        }
+      }, 100);
+    }
+
+    function showPopup(movie) {
+      const popup = document.getElementById('popup');
+      popup.innerHTML = `<strong>You should watch:</strong> <em>${movie}</em><br><br>
+        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(movie + ' trailer')}" target="_blank">
+          🎬 Watch Trailer
+        </a>`;
+      popup.style.display = "block";
+    }
+
+    function playSound(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.currentTime = 0;
+        el.play();
+      }
+    }
   </script>
 </body>
 </html>
