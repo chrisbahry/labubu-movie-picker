@@ -158,7 +158,13 @@
   <audio id="labubuVoice" src="labubuVoice.mp3" preload="auto"></audio>
   <audio id="labubuVoiceAngry" src="labubuVoiceAngry.mp3" preload="auto"></audio>
 
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js">
+updateAvailableMovies();
+updateMovieCountDisplay();
+const editor = document.getElementById('movieEditor');
+if (editor) editor.value = customList || defaultMovies.join('\n');
+
+</script>
   <script>
     let movies = [];
 
@@ -498,6 +504,12 @@ function clearWatched() {
         el.play();
       }
     }
-  </script>
+  
+updateAvailableMovies();
+updateMovieCountDisplay();
+const editor = document.getElementById('movieEditor');
+if (editor) editor.value = customList || defaultMovies.join('\n');
+
+</script>
 </body>
 </html>
