@@ -121,8 +121,8 @@
   <div id="popup"></div>
 
   <audio id="spinSound" src="spinSound.mp3" preload="auto"></audio>
-  <audio id="winSound" src="winSound.mp3" preload="auto"></audio>
-  <audio id="labubuVoice" src="labubuVoice.mp3" preload="auto"></audio>
+    <audio id="labubuVoice" src="labubuVoice.mp3" preload="auto"></audio>
+<audio id="labubuVoiceAngry" src="labubuVoiceAngry.mp3" preload="auto"></audio>
 
   <script>
     const movies = ["Blue", "Kingdom of Heaven", "Repo Man", "Indiana Jones", "Coherence", "Vivarium", "Kes", "Apartment 7A", "The Professional", "All of Us Strangers", "The Ascent", "La Chimera", "To Live & Die in LA", "Sorcerer", "Virgin Suicides", "Dream Scenario", "Fury Road", "Perfect Blue", "Enter the Void", "Roma"];
@@ -200,15 +200,14 @@
         count++;
         if (count > 30) {
           clearInterval(interval);
-          playSound("winSound");
-          confetti();
+                    confetti();
           showPopup(currentMovie);
           spinCount++;
           updateLabubuFace();
           updateLabubuMessage();
           updateMood();
           updateButtonLabel();
-          playSound("labubuVoice");
+          if (spinCount === maxSpins) { playSound("labubuVoiceAngry"); } else { playSound("labubuVoice"); }
         }
       }, 100);
     }
