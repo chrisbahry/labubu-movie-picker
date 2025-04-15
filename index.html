@@ -155,82 +155,17 @@
   resize: vertical;
 }
 
-
-.labubu-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.labubu-img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  width: 160px;
-}
-
-.labubu-img.show {
-  opacity: 1;
-}
-
-.blink-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 160px;
-  height: auto;
-  background: rgba(0,0,0,0.08);
-  opacity: 0;
-  animation: blink 6s infinite;
-  pointer-events: none;
-  z-index: 2;
-}
-
-@keyframes blink {
-  0%, 97%, 100% { opacity: 0; }
-  98%, 99% { opacity: 1; }
-}
-
-
-.labubu-wrapper {
-  position: relative;
-  display: inline-block;
-  width: 160px;
-  height: 160px;
-  margin-bottom: 10px;
-}
-
-.labubu-img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  width: 160px;
-  height: auto;
-  z-index: 1;
-}
-
-.labubu-img.show {
-  opacity: 1;
-  z-index: 2;
-}
-
 </style>
 </head>
 <body>
 
   <h1>Labubu's Movie Picker</h1>
 
-  <div class="labubu-wrapper">
-      <div id="labubuFaces">
+  <div id="labubuFaces">
     <img src="LabubuNeutral.png" id="faceNeutral" class="labubu-img" style="display:block;" />
     <img src="LabubuThinking.png" id="faceThinking" class="labubu-img" />
     <img src="LabubuExcited.png" id="faceExcited" class="labubu-img" />
     <img src="LabubuAngry.png" id="faceAngry" class="labubu-img" />
-  </div>
-    <div class="blink-overlay"></div>
   </div>
 
   <p id="labubuMessage">💬 Labubu says: Let's pick a movie! 🎲</p>
@@ -269,11 +204,10 @@
 
     function updateLabubuFace() {
       ["Neutral", "Thinking", "Excited", "Angry"].forEach(f => {
-  document.getElementById("face" + f).classList.remove("show");
         document.getElementById("face" + f).style.display = "none";
       });
       const state = spinCount === 0 ? "Neutral" : spinCount === 1 ? "Thinking" : spinCount === 2 ? "Excited" : "Angry";
-      document.getElementById("face" + state).classList.add("show");
+      document.getElementById("face" + state).style.display = "block";
     }
 
     function updateLabubuMessage() {
