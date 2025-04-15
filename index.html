@@ -47,8 +47,17 @@
   <h1>🎬 Labubu's Movie Picker</h1>
   <p id="movieCount">Loading movie count...</p>
   <div id="movieSlot">Press the button to spin!</div>
-  <div id="markWatchedArea"></div>
-  <button onclick="spinMovie()">🎲 Spin Movie!</button>
+  <div id="markWatchedArea">
+    </div>
+
+    <div style="margin-top: 30px;">
+      <h2>🎛️ Edit Movie List</h2>
+      <textarea id="movieEditor" rows="10" style="width:90%; max-width: 500px; font-family: monospace; border-radius: 8px; padding: 10px;"></textarea><br>
+      <button onclick="saveMovieList()">💾 Save List</button>
+      <button onclick="resetMovieList()">🔁 Reset to Default</button>
+    </div>
+
+    <button onclick="spinMovie()">🎲 Spin Movie!</button>
   <button onclick="clearWatched()">♻️ Clear Watched</button>
 
   <script>
@@ -217,6 +226,42 @@
   "The great dictator"
 ];
     let watched = JSON.parse(localStorage.getItem("watchedMovies") || "[]");
+
+    let customList = localStorage.getItem("customMovieList");
+
+    function getMovieList() {
+      const list = customList ? customList.split('\n').map(m => m.trim()).filter(Boolean) : defaultMovies.slice();
+      return list;
+    }
+
+    function updateAvailableMovies() {
+      availableMovies = getMovieList().filter(m => !watched.includes(m));
+    }
+
+    function saveMovieList() {
+      const raw = document.getElementById("movieEditor").value;
+      localStorage.setItem("customMovieList", raw);
+      customList = raw;
+      watched = [];
+      localStorage.removeItem("watchedMovies");
+      updateAvailableMovies();
+      updateCount();
+document.getElementById('movieEditor').value = customList ? customList : defaultMovies.join('\n');
+      alert("✅ List saved and watched list reset!");
+    }
+
+    function resetMovieList() {
+      localStorage.removeItem("customMovieList");
+      customList = null;
+      watched = [];
+      localStorage.removeItem("watchedMovies");
+      updateAvailableMovies();
+      updateCount();
+document.getElementById('movieEditor').value = customList ? customList : defaultMovies.join('\n');
+      document.getElementById("movieEditor").value = defaultMovies.join('\n');
+      alert("🔁 List reset to default and watched list cleared!");
+    }
+
     let availableMovies = [];
 
     function updateAvailableMovies() {
@@ -230,6 +275,7 @@
     function spinMovie() {
       updateAvailableMovies();
       updateCount();
+document.getElementById('movieEditor').value = customList ? customList : defaultMovies.join('\n');
       const slot = document.getElementById("movieSlot");
       const markArea = document.getElementById("markWatchedArea");
 
@@ -254,6 +300,7 @@
       document.getElementById("markWatchedArea").innerHTML = "";
       updateAvailableMovies();
       updateCount();
+document.getElementById('movieEditor').value = customList ? customList : defaultMovies.join('\n');
     }
 
     function clearWatched() {
@@ -261,10 +308,12 @@
       watched = [];
       updateAvailableMovies();
       updateCount();
+document.getElementById('movieEditor').value = customList ? customList : defaultMovies.join('\n');
     }
 
     updateAvailableMovies();
     updateCount();
+document.getElementById('movieEditor').value = customList ? customList : defaultMovies.join('\n');
   </script>
 </body>
 </html>
