@@ -156,48 +156,37 @@
 }
 
 
-/* Slot machine bounce effect during spin */
-@keyframes slotBounce {
-  0%, 100% { transform: scale(1); }
-  25%, 75% { transform: scale(1.05); }
-  50% { transform: scale(0.95); }
-}
-#movieSlot.spinning {
-  animation: slotBounce 0.4s infinite;
-}
-
-/* Question mark fly with pulse/rotate */
-@keyframes flyUp {
-  0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
-  100% { transform: translateY(-80px) rotate(360deg) scale(1.5); opacity: 0; }
-}
-.question {
-  animation: flyUp 1.2s ease-out forwards;
-}
-
-/* Labubu face fade */
-.labubu-img {
-  transition: opacity 0.4s ease;
-  opacity: 0;
-}
-.labubu-img.show {
-  opacity: 1;
-}
-
-/* Mood meter pulse */
-@mkeyframes pulse {
-  0%, 100% { transform: scaleX(1); }
-  50% { transform: scaleX(1.05); }
-}
-#moodFill {
-  transition: width 0.4s ease;
-  animation: pulse 2s infinite;
-}
-
-/* Button bounce on hover */
+/* Button hover bounce */
 button:hover {
   transform: scale(1.05);
   transition: transform 0.2s ease;
+}
+
+/* Labubu message bounce-in */
+@keyframes bounceIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  60% { transform: scale(1.05); opacity: 1; }
+  80% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+#labubuMessage {
+  animation: bounceIn 0.6s ease;
+}
+
+/* Save button glow */
+@keyframes glow {
+  0% { box-shadow: 0 0 0px #ff66b2; }
+  50% { box-shadow: 0 0 15px #ff66b2; }
+  100% { box-shadow: 0 0 0px #ff66b2; }
+}
+
+/* Watched movie fade out */
+@keyframes fadeOutShrink {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.8); }
+}
+.watchedAnimation {
+  animation: fadeOutShrink 0.6s ease forwards;
 }
 
 </style>
@@ -226,7 +215,33 @@ button:hover {
   <audio id="labubuVoice" src="labubuVoice.mp3" preload="auto"></audio>
   <audio id="labubuVoiceAngry" src="labubuVoiceAngry.mp3" preload="auto"></audio>
 
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js">
+    function playConfettiBurst() {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+
+    function markWatched(movie) {
+      watched.push(movie);
+      localStorage.setItem("watchedMovies", JSON.stringify(watched));
+      const el = document.querySelector('#popup');
+      if (el) el.classList.add('watchedAnimation');
+      setTimeout(() => alert(\`Marked "\${movie}" as watched. It won’t appear again.\`), 700);
+    }
+
+    function saveMovieList() {
+      const raw = document.getElementById("movieEditor").value;
+      localStorage.setItem("customMovieList", raw);
+      const btn = event.target;
+      btn.style.animation = "glow 0.8s ease";
+      setTimeout(() => btn.style.animation = "", 800);
+      alert("Movie list saved! Reload the page to use the updated list.");
+    }
+
+</script>
   <script>
     const movies = ["Blue", "Coherence", "Kes", "Enter the Void", "Fury Road", "Perfect Blue", "Dream Scenario", "Roma"];
     let spinCount = 0;
@@ -249,11 +264,10 @@ button:hover {
 
     function updateLabubuFace() {
       ["Neutral", "Thinking", "Excited", "Angry"].forEach(f => {
-  document.getElementById("face" + f).classList.remove("show");
         document.getElementById("face" + f).style.display = "none";
       });
       const state = spinCount === 0 ? "Neutral" : spinCount === 1 ? "Thinking" : spinCount === 2 ? "Excited" : "Angry";
-      document.getElementById("face" + state).classList.add("show");
+      document.getElementById("face" + state).style.display = "block";
     }
 
     function updateLabubuMessage() {
@@ -312,7 +326,6 @@ button:hover {
       document.getElementById("popup").style.display = "none";
 
       let count = 0;
-      display.classList.add('spinning');
       const interval = setInterval(() => {
         const randomMovie = movies[Math.floor(Math.random() * movies.length)];
         display.textContent = randomMovie;
@@ -320,9 +333,8 @@ button:hover {
         count++;
         if (count > 30) {
           clearInterval(interval);
-          display.classList.remove('spinning');
           if (spinCount < maxSpins - 1) {
-            confetti();
+            playConfettiBurst();
             playSound("labubuVoice");
           } else {
             showPuffs();
@@ -355,7 +367,33 @@ button:hover {
         el.play();
       }
     }
-  </script>
+  
+    function playConfettiBurst() {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+
+    function markWatched(movie) {
+      watched.push(movie);
+      localStorage.setItem("watchedMovies", JSON.stringify(watched));
+      const el = document.querySelector('#popup');
+      if (el) el.classList.add('watchedAnimation');
+      setTimeout(() => alert(\`Marked "\${movie}" as watched. It won’t appear again.\`), 700);
+    }
+
+    function saveMovieList() {
+      const raw = document.getElementById("movieEditor").value;
+      localStorage.setItem("customMovieList", raw);
+      const btn = event.target;
+      btn.style.animation = "glow 0.8s ease";
+      setTimeout(() => btn.style.animation = "", 800);
+      alert("Movie list saved! Reload the page to use the updated list.");
+    }
+
+</script>
 
   <div id="movieEditorBox">
     <h2>Edit Movie List</h2>
@@ -408,7 +446,33 @@ button:hover {
       const stored = localStorage.getItem("customMovieList");
       document.getElementById("movieEditor").value = stored || defaultMovies.join('\n');
     }
-  </script>
+  
+    function playConfettiBurst() {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+
+    function markWatched(movie) {
+      watched.push(movie);
+      localStorage.setItem("watchedMovies", JSON.stringify(watched));
+      const el = document.querySelector('#popup');
+      if (el) el.classList.add('watchedAnimation');
+      setTimeout(() => alert(\`Marked "\${movie}" as watched. It won’t appear again.\`), 700);
+    }
+
+    function saveMovieList() {
+      const raw = document.getElementById("movieEditor").value;
+      localStorage.setItem("customMovieList", raw);
+      const btn = event.target;
+      btn.style.animation = "glow 0.8s ease";
+      setTimeout(() => btn.style.animation = "", 800);
+      alert("Movie list saved! Reload the page to use the updated list.");
+    }
+
+</script>
 </body>
 </html>
 
