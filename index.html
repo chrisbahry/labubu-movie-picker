@@ -192,6 +192,31 @@
   98%, 99% { opacity: 1; }
 }
 
+
+.labubu-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 160px;
+  height: 160px;
+  margin-bottom: 10px;
+}
+
+.labubu-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  width: 160px;
+  height: auto;
+  z-index: 1;
+}
+
+.labubu-img.show {
+  opacity: 1;
+  z-index: 2;
+}
+
 </style>
 </head>
 <body>
