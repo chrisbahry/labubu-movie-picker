@@ -284,5 +284,53 @@
       }
     }
   </script>
+
+  <div style="margin-top: 30px;">
+    <h2>Edit Movie List</h2>
+    <textarea id="movieEditor" rows="10" style="width: 90%; max-width: 500px; font-family: monospace;"></textarea><br>
+    <button onclick="saveMovieList()">Save List</button>
+    <button onclick="resetMovieList()">Reset to Default</button>
+  </div>
+
+  <script>
+    let defaultMovies = [
+      "Blue", "Coherence", "Kes", "Enter the Void", 
+      "Fury Road", "Perfect Blue", "Dream Scenario", "Roma"
+    ];
+
+    let watched = JSON.parse(localStorage.getItem("watchedMovies") || "[]");
+
+    function loadMovieList() {
+      const stored = localStorage.getItem("customMovieList");
+      let list = stored ? stored.split('\n') : defaultMovies;
+      return list.map(m => m.trim()).filter(m => m && !watched.includes(m));
+    }
+
+    function saveMovieList() {
+      const raw = document.getElementById("movieEditor").value;
+      localStorage.setItem("customMovieList", raw);
+      alert("Movie list saved! Reload the page to use the updated list.");
+    }
+
+    function resetMovieList() {
+      localStorage.removeItem("customMovieList");
+      alert("Movie list reset to default! Reload the page.");
+    }
+
+    function markWatched(movie) {
+      watched.push(movie);
+      localStorage.setItem("watchedMovies", JSON.stringify(watched));
+      alert(`Marked "${movie}" as watched. It won’t appear again.`);
+    }
+
+    movies = loadMovieList();
+
+    window.onload = () => {
+      const stored = localStorage.getItem("customMovieList");
+      document.getElementById("movieEditor").value = stored || defaultMovies.join('\n');
+    }
+  </script>
 </body>
+</html>
+
 </html>
