@@ -12,8 +12,36 @@
       font-weight: normal;
       font-style: normal;
     }
+    
+    .puff {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #ccc;
+      border-radius: 50%;
+      opacity: 0.7;
+      animation: puffAnim 1s ease-out forwards;
+    }
+
+    @keyframes puffAnim {
+      0%   { transform: scale(1) translateY(0); opacity: 0.7; }
+      100% { transform: scale(3) translateY(-50px); opacity: 0; }
+    }
     </style>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js">
+    function showPuffs() {
+      const num = 8;
+      for (let i = 0; i < num; i++) {
+        const puff = document.createElement('div');
+        puff.className = 'puff';
+        puff.style.left = (50 + Math.random() * 30 - 15) + '%';
+        puff.style.top = (50 + Math.random() * 20 - 10) + '%';
+        puff.style.position = 'absolute';
+        document.body.appendChild(puff);
+        setTimeout(() => puff.remove(), 1000);
+      }
+    }
+    </script>
   <style>
     body {
       font-family: 'Chewy Bubble', cursive;
@@ -96,7 +124,22 @@
       color: #ff3399;
       font-weight: bold;
     }
-  </style>
+  
+    .puff {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #ccc;
+      border-radius: 50%;
+      opacity: 0.7;
+      animation: puffAnim 1s ease-out forwards;
+    }
+
+    @keyframes puffAnim {
+      0%   { transform: scale(1) translateY(0); opacity: 0.7; }
+      100% { transform: scale(3) translateY(-50px); opacity: 0; }
+    }
+    </style>
 </head>
 <body>
 
@@ -207,7 +250,7 @@
           updateLabubuMessage();
           updateMood();
           updateButtonLabel();
-          if (spinCount === maxSpins) { playSound("labubuVoiceAngry"); } else { playSound("labubuVoice"); }
+          if (spinCount === maxSpins) { playSound("labubuVoiceAngry"); showPuffs(); } else { playSound("labubuVoice"); }
         }
       }, 100);
     }
@@ -220,6 +263,19 @@
         </a>`;
       popup.style.display = "block";
     }
-  </script>
+  
+    function showPuffs() {
+      const num = 8;
+      for (let i = 0; i < num; i++) {
+        const puff = document.createElement('div');
+        puff.className = 'puff';
+        puff.style.left = (50 + Math.random() * 30 - 15) + '%';
+        puff.style.top = (50 + Math.random() * 20 - 10) + '%';
+        puff.style.position = 'absolute';
+        document.body.appendChild(puff);
+        setTimeout(() => puff.remove(), 1000);
+      }
+    }
+    </script>
 </body>
 </html>
