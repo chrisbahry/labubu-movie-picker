@@ -41,7 +41,26 @@
         setTimeout(() => puff.remove(), 1000);
       }
     }
-    </script>
+    
+let audioUnlocked = false;
+
+document.body.addEventListener('click', () => {
+  if (!audioUnlocked) {
+    const voices = ['labubuVoice', 'labubuVoiceAngry'];
+    voices.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.play().then(() => {
+          el.pause();
+          el.currentTime = 0;
+        }).catch(() => {});
+      }
+    });
+    audioUnlocked = true;
+  }
+});
+
+</script>
   <style>
     body {
       font-family: 'Chewy Bubble', cursive;
@@ -275,6 +294,25 @@
         setTimeout(() => puff.remove(), 1000);
       }
     }
-    </script>
+    
+let audioUnlocked = false;
+
+document.body.addEventListener('click', () => {
+  if (!audioUnlocked) {
+    const voices = ['labubuVoice', 'labubuVoiceAngry'];
+    voices.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.play().then(() => {
+          el.pause();
+          el.currentTime = 0;
+        }).catch(() => {});
+      }
+    });
+    audioUnlocked = true;
+  }
+});
+
+</script>
 </body>
 </html>
