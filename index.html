@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Labubu Movie Picker (Minimal)</title>
+  <title>Labubu Movie Picker (Watched)</title>
   <style>
     body {
       font-family: sans-serif;
@@ -32,6 +32,7 @@
       border-radius: 8px;
       font-size: 1rem;
       cursor: pointer;
+      margin: 5px;
     }
     button:hover {
       background: #ff66aa;
@@ -46,10 +47,12 @@
   <h1>🎬 Labubu's Movie Picker</h1>
   <p id="movieCount">Loading movie count...</p>
   <div id="movieSlot">Press the button to spin!</div>
+  <div id="markWatchedArea"></div>
   <button onclick="spinMovie()">🎲 Spin Movie!</button>
+  <button onclick="clearWatched()">♻️ Clear Watched</button>
 
   <script>
-    const movies = [
+    const defaultMovies = [
   "Blue",
   "Kingdom of Heaven",
   "Repo Man",
@@ -213,20 +216,54 @@
   "Roma",
   "The great dictator"
 ];
+    let watched = JSON.parse(localStorage.getItem("watchedMovies") || "[]");
+    let availableMovies = [];
+
+    function updateAvailableMovies() {
+      availableMovies = defaultMovies.filter(m => !watched.includes(m));
+    }
 
     function updateCount() {
-      document.getElementById("movieCount").textContent = `🎞️ Available Movies: ${movies.length}`;
+      document.getElementById("movieCount").textContent = `🎞️ Available Movies: ${availableMovies.length}`;
     }
 
     function spinMovie() {
+      updateAvailableMovies();
+      updateCount();
       const slot = document.getElementById("movieSlot");
+      const markArea = document.getElementById("markWatchedArea");
+
+      if (availableMovies.length === 0) {
+        slot.textContent = "🎉 You've watched everything!";
+        markArea.innerHTML = "";
+        return;
+      }
+
       slot.textContent = "🎰 Spinning...";
+      markArea.innerHTML = "";
       setTimeout(() => {
-        const movie = movies[Math.floor(Math.random() * movies.length)];
+        const movie = availableMovies[Math.floor(Math.random() * availableMovies.length)];
         slot.textContent = `🎬 You should watch: ${movie}`;
+        markArea.innerHTML = `<button onclick="markAsWatched('${movie}')">✅ Mark as Watched</button>`;
       }, 1000);
     }
 
+    function markAsWatched(movie) {
+      watched.push(movie);
+      localStorage.setItem("watchedMovies", JSON.stringify(watched));
+      document.getElementById("markWatchedArea").innerHTML = "";
+      updateAvailableMovies();
+      updateCount();
+    }
+
+    function clearWatched() {
+      localStorage.removeItem("watchedMovies");
+      watched = [];
+      updateAvailableMovies();
+      updateCount();
+    }
+
+    updateAvailableMovies();
     updateCount();
   </script>
 </body>
