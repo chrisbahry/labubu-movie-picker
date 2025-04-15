@@ -156,37 +156,40 @@
 }
 
 
-/* Button hover bounce */
-button:hover {
-  transform: scale(1.05);
-  transition: transform 0.2s ease;
+.labubu-wrapper {
+  position: relative;
+  display: inline-block;
 }
 
-/* Labubu message bounce-in */
-@keyframes bounceIn {
-  0% { transform: scale(0.8); opacity: 0; }
-  60% { transform: scale(1.05); opacity: 1; }
-  80% { transform: scale(0.95); }
-  100% { transform: scale(1); }
-}
-#labubuMessage {
-  animation: bounceIn 0.6s ease;
+.labubu-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  width: 160px;
 }
 
-/* Save button glow */
-@keyframes glow {
-  0% { box-shadow: 0 0 0px #ff66b2; }
-  50% { box-shadow: 0 0 15px #ff66b2; }
-  100% { box-shadow: 0 0 0px #ff66b2; }
+.labubu-img.show {
+  opacity: 1;
 }
 
-/* Watched movie fade out */
-@keyframes fadeOutShrink {
-  0% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(0.8); }
+.blink-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 160px;
+  height: auto;
+  background: rgba(0,0,0,0.08);
+  opacity: 0;
+  animation: blink 6s infinite;
+  pointer-events: none;
+  z-index: 2;
 }
-.watchedAnimation {
-  animation: fadeOutShrink 0.6s ease forwards;
+
+@keyframes blink {
+  0%, 97%, 100% { opacity: 0; }
+  98%, 99% { opacity: 1; }
 }
 
 </style>
@@ -195,11 +198,14 @@ button:hover {
 
   <h1>Labubu's Movie Picker</h1>
 
-  <div id="labubuFaces">
+  <div class="labubu-wrapper">
+      <div id="labubuFaces">
     <img src="LabubuNeutral.png" id="faceNeutral" class="labubu-img" style="display:block;" />
     <img src="LabubuThinking.png" id="faceThinking" class="labubu-img" />
     <img src="LabubuExcited.png" id="faceExcited" class="labubu-img" />
     <img src="LabubuAngry.png" id="faceAngry" class="labubu-img" />
+  </div>
+    <div class="blink-overlay"></div>
   </div>
 
   <p id="labubuMessage">💬 Labubu says: Let's pick a movie! 🎲</p>
@@ -215,33 +221,7 @@ button:hover {
   <audio id="labubuVoice" src="labubuVoice.mp3" preload="auto"></audio>
   <audio id="labubuVoiceAngry" src="labubuVoiceAngry.mp3" preload="auto"></audio>
 
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js">
-    function playConfettiBurst() {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
-    }
-
-    function markWatched(movie) {
-      watched.push(movie);
-      localStorage.setItem("watchedMovies", JSON.stringify(watched));
-      const el = document.querySelector('#popup');
-      if (el) el.classList.add('watchedAnimation');
-      setTimeout(() => alert(\`Marked "\${movie}" as watched. It won’t appear again.\`), 700);
-    }
-
-    function saveMovieList() {
-      const raw = document.getElementById("movieEditor").value;
-      localStorage.setItem("customMovieList", raw);
-      const btn = event.target;
-      btn.style.animation = "glow 0.8s ease";
-      setTimeout(() => btn.style.animation = "", 800);
-      alert("Movie list saved! Reload the page to use the updated list.");
-    }
-
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script>
     const movies = ["Blue", "Coherence", "Kes", "Enter the Void", "Fury Road", "Perfect Blue", "Dream Scenario", "Roma"];
     let spinCount = 0;
@@ -264,10 +244,11 @@ button:hover {
 
     function updateLabubuFace() {
       ["Neutral", "Thinking", "Excited", "Angry"].forEach(f => {
+  document.getElementById("face" + f).classList.remove("show");
         document.getElementById("face" + f).style.display = "none";
       });
       const state = spinCount === 0 ? "Neutral" : spinCount === 1 ? "Thinking" : spinCount === 2 ? "Excited" : "Angry";
-      document.getElementById("face" + state).style.display = "block";
+      document.getElementById("face" + state).classList.add("show");
     }
 
     function updateLabubuMessage() {
@@ -334,7 +315,7 @@ button:hover {
         if (count > 30) {
           clearInterval(interval);
           if (spinCount < maxSpins - 1) {
-            playConfettiBurst();
+            confetti();
             playSound("labubuVoice");
           } else {
             showPuffs();
@@ -367,33 +348,7 @@ button:hover {
         el.play();
       }
     }
-  
-    function playConfettiBurst() {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
-    }
-
-    function markWatched(movie) {
-      watched.push(movie);
-      localStorage.setItem("watchedMovies", JSON.stringify(watched));
-      const el = document.querySelector('#popup');
-      if (el) el.classList.add('watchedAnimation');
-      setTimeout(() => alert(\`Marked "\${movie}" as watched. It won’t appear again.\`), 700);
-    }
-
-    function saveMovieList() {
-      const raw = document.getElementById("movieEditor").value;
-      localStorage.setItem("customMovieList", raw);
-      const btn = event.target;
-      btn.style.animation = "glow 0.8s ease";
-      setTimeout(() => btn.style.animation = "", 800);
-      alert("Movie list saved! Reload the page to use the updated list.");
-    }
-
-</script>
+  </script>
 
   <div id="movieEditorBox">
     <h2>Edit Movie List</h2>
@@ -446,33 +401,7 @@ button:hover {
       const stored = localStorage.getItem("customMovieList");
       document.getElementById("movieEditor").value = stored || defaultMovies.join('\n');
     }
-  
-    function playConfettiBurst() {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
-    }
-
-    function markWatched(movie) {
-      watched.push(movie);
-      localStorage.setItem("watchedMovies", JSON.stringify(watched));
-      const el = document.querySelector('#popup');
-      if (el) el.classList.add('watchedAnimation');
-      setTimeout(() => alert(\`Marked "\${movie}" as watched. It won’t appear again.\`), 700);
-    }
-
-    function saveMovieList() {
-      const raw = document.getElementById("movieEditor").value;
-      localStorage.setItem("customMovieList", raw);
-      const btn = event.target;
-      btn.style.animation = "glow 0.8s ease";
-      setTimeout(() => btn.style.animation = "", 800);
-      alert("Movie list saved! Reload the page to use the updated list.");
-    }
-
-</script>
+  </script>
 </body>
 </html>
 
