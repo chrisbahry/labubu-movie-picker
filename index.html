@@ -172,7 +172,8 @@
 
   <div id="moodMeter"><div id="moodFill"></div></div>
 
-  <div class="slot" id="movieSlot">Ready to spin?</div>
+  <p id="movieCount" style="color:#ff3399; font-weight:bold;">Loading movie list...</p>
+<div class="slot" id="movieSlot">Ready to spin?</div>
   <button onclick="spinSlot()" id="spinBtn">Spin Movie!</button>
 
   <div id="popup"></div>
@@ -485,7 +486,12 @@
 
     let watched = JSON.parse(localStorage.getItem("watchedMovies") || "[]");
 
-    function loadMovieList() {
+    
+function updateMovieCountDisplay() {
+  document.getElementById("movieCount").textContent = `🎞️ Available Movies: ${movies.length}`;
+}
+
+function loadMovieList() {
       const stored = localStorage.getItem("customMovieList");
       let list = stored ? stored.split('\n') : defaultMovies;
       return list.map(m => m.trim()).filter(m => m && !watched.includes(m));
@@ -515,6 +521,7 @@
     }
 
     movies = loadMovieList();
+updateMovieCountDisplay();
 
     window.onload = () => {
       const stored = localStorage.getItem("customMovieList");
