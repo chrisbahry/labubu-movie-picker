@@ -5,16 +5,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Labubu Movie Picker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Chewy&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
-    @font-face {
-      font-family: 'Chewy Bubble';
-      src: url('Chewy Bubble.ttf') format('truetype');
-      font-weight: normal;
-      font-style: normal;
-    }
-
     body {
-      font-family: 'Chewy Bubble', cursive;
+      font-family: 'Chewy', cursive;
       background: linear-gradient(to bottom, #ffccff, #ffe6f2);
       color: #ff3399;
       text-align: center;
@@ -24,13 +19,25 @@
       flex-direction: column;
       align-items: center;
     }
-
     h1 {
       font-size: 2.5rem;
       margin-bottom: 20px;
     }
-
+    button {
+      padding: 15px 30px;
+      margin: 10px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      background: #ff66b2;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+    }
     .slot {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 2rem;
       padding: 1.5rem;
       border: 4px dashed #ff99cc;
@@ -43,34 +50,170 @@
       text-align: center;
       color: #ff3399;
     }
-
-    button {
-      padding: 15px 30px;
-      margin: 10px;
-      font-size: 1.2rem;
-      cursor: pointer;
-      background: #ff66b2;
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+    .labubu-img {
+      width: 160px;
+      margin: 0 auto;
+      display: none;
     }
-
     #labubuMessage {
       font-size: 1.1rem;
       color: #ff3399;
       margin: 12px auto;
     }
+    #moodMeter {
+      width: 80%;
+      max-width: 300px;
+      height: 20px;
+      border: 2px solid #cc66aa;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+    #moodFill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(to right, #66ccff, #ffcc00, #ff3366);
+      border-radius: 10px;
+    }
+    #popup {
+      background: #fff;
+      color: #ff3399;
+      border: 3px solid #ff66b2;
+      padding: 20px;
+      margin: 20px auto;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 12px;
+      display: none;
+    }
+    #popup a {
+      color: #ff3399;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
-  <h1>Labubu's Movie Picker</h1>
+  <h1 style="font-family: 'Chewy Bubble', cursive;">Labubu's Movie Picker</h1>
 
-  <p id="labubuMessage">💬 Labubu says: Let's pick a movie! 🎲</p>
+  <div id="labubuFaces">
+    <img src="LabubuNeutral.png" id="faceNeutral" class="labubu-img" style="display:block;" />
+    <img src="LabubuThinking.png" id="faceThinking" class="labubu-img" />
+    <img src="LabubuExcited.png" id="faceExcited" class="labubu-img" />
+    <img src="LabubuAngry.png" id="faceAngry" class="labubu-img" />
+  </div>
+
+  <p id="labubuMessage"></p>
+
+  <div id="moodMeter">
+    <div id="moodFill"></div>
+  </div>
 
   <div class="slot" id="movieSlot">Ready to spin?</div>
-  <button>Spin Movie!</button>
+  <button onclick="spinSlot()" id="spinBtn">Spin Movie!</button>
 
+  <div id="popup"></div>
+
+  <audio id="spinSound" src="spinSound.mp3" preload="auto"></audio>
+  <audio id="winSound" src="winSound.mp3" preload="auto"></audio>
+  <audio id="labubuVoice" src="labubuVoice.mp3" preload="auto"></audio>
+
+  <script>
+    const movies = ["Blue", "Kingdom of Heaven", "Repo Man", "Indiana Jones", "Coherence", "Vivarium", "Kes", "Apartment 7A", "The Professional", "All of Us Strangers", "The Ascent", "La Chimera", "To Live & Die in LA", "Sorcerer", "Virgin Suicides", "Dream Scenario", "Fury Road", "Perfect Blue", "Enter the Void", "Roma"];
+    let spinCount = 0;
+    const maxSpins = 3;
+    let currentMovie = "";
+
+    function updateLabubuFace() {
+      const faces = ["Neutral", "Thinking", "Excited", "Angry"];
+      faces.forEach(face => document.getElementById("face" + face).style.display = "none");
+      if (spinCount === 0) {
+        document.getElementById("faceNeutral").style.display = "block";
+      } else if (spinCount === 1) {
+        document.getElementById("faceThinking").style.display = "block";
+      } else if (spinCount === 2) {
+        document.getElementById("faceExcited").style.display = "block";
+      } else {
+        document.getElementById("faceAngry").style.display = "block";
+      }
+    }
+
+    function updateLabubuMessage() {
+      const msg = document.getElementById("labubuMessage");
+      if (spinCount === 0) {
+        msg.innerText = "💬 Labubu says: Let's pick a movie! 🎲";
+      } else if (spinCount === 1) {
+        msg.innerText = "💬 Labubu says: That was fun! Wanna spin again?";
+      } else if (spinCount === 2) {
+        msg.innerText = "💬 Labubu says: Last chance! Choose wisely... 🧐";
+      } else {
+        msg.innerText = "💬 Labubu says: I’ve made a pick for you! You must watch it now, teehee! 🎉";
+      }
+    }
+
+    function updateMood() {
+      const fill = document.getElementById("moodFill");
+      const percent = Math.min((spinCount / maxSpins) * 100, 100);
+      fill.style.width = percent + "%";
+    }
+
+    function playSound(id) {
+      const sound = document.getElementById(id);
+      sound.currentTime = 0;
+      sound.play();
+    }
+
+    function updateButtonLabel() {
+      const btn = document.getElementById("spinBtn");
+      if (spinCount === 0) {
+        btn.innerText = "Spin Movie!";
+      } else if (spinCount === 1) {
+        btn.innerText = "Spin Again?";
+      } else if (spinCount === 2) {
+        btn.innerText = "Last Chance!";
+      } else {
+        btn.innerText = "No Spins Left";
+        btn.disabled = true;
+      }
+    }
+
+    function spinSlot() {
+      const display = document.getElementById("movieSlot");
+      document.getElementById("popup").style.display = "none";
+      playSound("spinSound");
+      updateLabubuFace();
+      updateLabubuMessage();
+      updateMood();
+      updateButtonLabel();
+
+      let count = 0;
+      const interval = setInterval(() => {
+        const randomMovie = movies[Math.floor(Math.random() * movies.length)];
+        display.textContent = randomMovie;
+        currentMovie = randomMovie;
+        count++;
+        if (count > 30) {
+          clearInterval(interval);
+          playSound("winSound");
+          confetti();
+          showPopup(currentMovie);
+          spinCount++;
+          updateLabubuFace();
+          updateLabubuMessage();
+          updateMood();
+          updateButtonLabel();
+          playSound("labubuVoice");
+        }
+      }, 100);
+    }
+
+    function showPopup(movie) {
+      const popup = document.getElementById('popup');
+      popup.innerHTML = `<strong>You should watch:</strong> <em>${movie}</em><br><br>
+        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(movie + ' trailer')}" target="_blank">
+          🎬 Watch Trailer
+        </a>`;
+      popup.style.display = "block";
+    }
+  </script>
 </body>
 </html>
